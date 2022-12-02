@@ -15,3 +15,4 @@ try {
 const db = mongoClient.db("drivencracyDB");
 
 export const pollCollection = db.collection("polls");
+export const choiceCollection = db.collection("choice");
