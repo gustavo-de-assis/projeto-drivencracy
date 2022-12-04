@@ -52,7 +52,7 @@ export async function voteChoice(req, res) {
 
         await voteCollection.insertOne({
             createdAt: dayjs().format('YYYY/MM/DD HH:mm:ss'),
-            choiceId: new ObjectId(id)
+            choiceId: id
         })
 
         /*let updateVote = Number(choice.votes);
