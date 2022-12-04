@@ -2,7 +2,7 @@ import joi from "joi";
 import dayjs from "dayjs";
 
 const pollSchema = joi.object({
-    title: joi.string().min(20).required(), //min de 20 caracteres para pergunta
+    title: joi.string().min(10).required(), //min de 20 caracteres para pergunta
     expireAt: joi.string()
 })
 

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { ObjectId } from "mongodb";
-import { choiceCollection, pollCollection } from "../database/db.js";
+import { choiceCollection, pollCollection, voteCollection } from "../database/db.js";
 
 export async function postChoice(req, res){
     const newChoice = req.body;
@@ -14,20 +14,16 @@ export async function postChoice(req, res){
         
         const poll = await pollCollection.findOne({_id: ObjectId(newChoice.pollId)});
         
-
-
         if(!poll){
             return res.status(404).send("Poll not found!");
         }
         
         if(dayjs().isAfter(poll.expireAt)){
-            console.log(poll.expireAt);
-            console.log(dayjs());
-
             return res.status(403).send("Poll already expired!");
         }
 
         await choiceCollection.insertOne({...newChoice});
+        await voteCollection.insertOne({...newChoice, votes: 0})
 
         res.sendStatus(201);
 
@@ -39,20 +35,31 @@ export async function postChoice(req, res){
 
 export async function voteChoice(req, res){
     const id = req.params.id;
-    const choice = await choiceCollection.findOne({_id: new ObjectId(id)})
+    const choice = await voteCollection.findOne({_id: new ObjectId(id)})
 
-    //atualizar valor da escolha
     try{
+        //Existe a opcao?
         if(!choice){
             return res.status(404).send("Not Found!");
         }
 
+        const poll = await pollCollection.findOne({_id: new ObjectId(choice.pollId)});
+
+        //Enquete expirada?
+        if(dayjs().isAfter(poll.expireAt)){
+            return res.status(403).send("Poll already expired!");
+        }
+
         let updateVote = Number(choice.votes);
         isNaN(updateVote)? updateVote = 1 : updateVote++;
-    
-        console.log(updateVote);
 
-        choiceCollection.updateOne({_id: new ObjectId(id)}, {$set: {votes: updateVote}})
+        voteCollection.updateOne({_id: new ObjectId(id)}, 
+        {$set: {votes: updateVote}})
+
+        voteCollection.updateOne({_id: new ObjectId(id)}, {$push:{date: dayjs().format('YYYY/MM/DD HH:mm:ss')}})
+
+        console.log(choice);
+
         return res.sendStatus(200);
     } catch (err){
         res.sendStatus(500);
