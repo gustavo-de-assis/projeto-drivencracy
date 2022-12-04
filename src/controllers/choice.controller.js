@@ -23,7 +23,6 @@ export async function postChoice(req, res) {
         }
 
         await choiceCollection.insertOne({ ...newChoice });
-        /*await voteCollection.insertOne({...newChoice, votes: 0})*/
 
         res.sendStatus(201);
 
@@ -54,16 +53,6 @@ export async function voteChoice(req, res) {
             createdAt: dayjs().format('YYYY/MM/DD HH:mm:ss'),
             choiceId: id
         })
-
-        /*let updateVote = Number(choice.votes);
-        isNaN(updateVote)? updateVote = 1 : updateVote++;
-
-        voteCollection.updateOne({_id: new ObjectId(id)}, 
-        {$set: {votes: updateVote}})
-
-        voteCollection.updateOne({_id: new ObjectId(id)}, {$push:{date: dayjs().format('YYYY/MM/DD HH:mm:ss')}})
-
-        console.log(choice);*/
 
         return res.sendStatus(200);
     } catch (err) {
