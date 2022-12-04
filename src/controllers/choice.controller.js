@@ -29,13 +29,23 @@ export async function postChoice(req, res){
 
 export async function voteChoice(req, res){
     const id = req.params.id;
-    const choice = await choiceCollection.find({_id: new ObjectId(id)});
-
-    if(!choice){
-        return res.status(404).send("Not Found!");
-    }
+    const choice = await choiceCollection.findOne({_id: new ObjectId(id)})
 
     //atualizar valor da escolha
+    try{
+        if(!choice){
+            return res.status(404).send("Not Found!");
+        }
 
+        let updateVote = Number(choice.votes);
+        isNaN(updateVote)? updateVote = 0 : updateVote++;
+    
+        console.log(updateVote);
+
+        choiceCollection.updateOne({_id: new ObjectId(id)}, {$set: {votes: updateVote}})
+        return res.sendStatus(200);
+    } catch (err){
+        res.sendStatus(500);
+    }
 
 }
