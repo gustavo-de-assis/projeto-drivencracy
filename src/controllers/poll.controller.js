@@ -1,4 +1,5 @@
-import { pollCollection } from "../database/db.js";
+import { ObjectId } from "mongodb";
+import { choiceCollection, pollCollection } from "../database/db.js";
 
 export async function postPoll(req, res){
     const newPoll = req.body;
@@ -26,6 +27,22 @@ export async function getPoll(req, res){
         res.send(polls).status(200);
         
     } catch (err){
+        res.sendStatus(500);
+    }
+}
+
+export async function getPollChoices(req, res){
+    const id = req.params.id;
+    const choices = await choiceCollection.find({pollId: id}).toArray();
+    
+
+    try{
+        if(choices.length === 0){
+            return res.status(404).send("Not Found!");
+        }
+        return res.status(200).send(choices);
+    }
+    catch(err){
         res.sendStatus(500);
     }
 }

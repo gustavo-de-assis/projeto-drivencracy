@@ -26,3 +26,16 @@ export async function postChoice(req, res){
         res.status(500).send("Couldn't create choice!");
     }
 }
+
+export async function voteChoice(req, res){
+    const id = req.params.id;
+    const choice = await choiceCollection.find({_id: new ObjectId(id)});
+
+    if(!choice){
+        return res.status(404).send("Not Found!");
+    }
+
+    //atualizar valor da escolha
+
+
+}
